@@ -1,0 +1,35 @@
+# sources: https://djangowaves.com/tips-tricks/gitignore-for-a-django-project/
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+media
+
+# Backup files # 
+*.bak
+
+# Environments
+*.pem 
+.env 
+.venv 
+env/ 
+venv/ 
+ENV/ 
+env.bak/ 
+venv.bak/ 
+data/certbot/conf/archive/
+data/certbot/conf/key/
+
+# Visual Studio Code # 
+.vscode/* 
+!.vscode/settings.json 
+!.vscode/tasks.json 
+!.vscode/launch.json 
+!.vscode/extensions.json 
+.history
+
+# other files
+#config/certbot/*
+#static/admin/*
+#static/*

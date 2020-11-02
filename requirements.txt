@@ -1,0 +1,10 @@
+Django>=2.0,<3.0
+channels
+channels_redis
+psycopg2-binary>=2.8
+# asgi_redis
+# asgiref~=1.1.2
+requests
+aiohttp
+boto3
+django-cors-headers

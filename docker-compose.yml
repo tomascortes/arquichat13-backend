@@ -1,0 +1,140 @@
+# sources: 
+# https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71
+# https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose-es
+# https://github.com/productive-dev/minimal-reverse-proxy-demo/blob/master/docker-compose.yml
+# https://github.com/daleal/docker-walkthrough/blob/master/example/docker-compose.yml
+# https://github.com/blackadress/docker-django-postgres-nginx
+# https://github.com/justdjango/justchat/tree/master/chat
+# https://channels.readthedocs.io/en/latest/tutorial/index.html
+# https://stackoverflow.com/questions/33992867/how-do-you-perform-django-database-migrations-when-using-docker-compose
+# https://stackoverflow.com/questions/50274624/django-migrations-and-docker-containers
+# https://stackoverflow.com/questions/52942913/docker-compose-docker-entrypoint
+# https://github.com/andrewgodwin/channels-examples/tree/master/multichat
+# https://www.youtube.com/watch?v=Ev5xgwndmfc
+# https://www.youtube.com/watch?v=z4lfVsb_7MA
+# https://www.youtube.com/watch?v=8ZTVGCoEyFs 
+
+version: '3'
+
+services:
+  db:
+    restart: always
+    image: postgres
+    env_file: 
+      - .env
+    ports:
+      - "5432:5432"
+    networks:
+      - mynet
+    volumes: 
+      - data:/var/lib/postgresql/data
+
+  api:
+    restart: always
+    container_name: api
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    command: /entrypoint.sh
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file: 
+      - .env 
+    depends_on:
+      - db
+      - redis
+    networks:
+      - mynet
+
+  redis:
+    restart: always
+    image: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/redis
+    env_file: 
+      - .env
+    networks:
+      - mynet
+
+  nginx:
+    image: nginx:1.15.9-alpine
+    depends_on:
+        - api
+        - worker_channels
+        - channels
+    volumes:
+        - ./config/nginx/:/etc/nginx/conf.d
+        - ./data/certbot/conf:/etc/letsencrypt
+        - ./data/certbot/www:/var/www/certbot
+        # - ./config/certbot/conf:/etc/letsencrypt
+        # - ./config/certbot/www:/var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - mynet
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+      
+  #   command: "/bin/sh -c 'while :; do sleep 12h & wait $${!}; sudo nginx -s reload; done & nginx -g \"daemon off;\"'"
+  # certbot:
+  #   image: certbot/certbot
+  #   volumes:
+  #     - ./config/certbot/conf:/etc/letsencrypt
+  #     - ./config/certbot/www:/var/www/certbot
+  #   networks:
+  #     - mynet
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  worker_channels:
+    build: .
+    command: python manage.py runworker
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+    env_file: 
+      - .env
+    networks:
+      - mynet
+  channels:
+    build: .
+   # command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
+    command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
+
+    volumes:
+      - .:/code
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - redis
+    links: 
+      - redis
+    env_file:
+      - .env
+    networks:
+      - mynet
+volumes:
+  .:
+  data:
+  redis: 
+
+networks:
+  mynet:
+    driver: bridge
