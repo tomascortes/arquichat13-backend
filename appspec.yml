@@ -1,12 +1,13 @@
 version: 0.0
 os: linux
+
 files:
-  - source: /scripts
-    destination: /home/ec2-user/web/arquichat
+  - source: scripts
+    destination: /home/ec2-user/web/MYAPP
 permissions:
-    - object: scripts
-        pattern: "**"
-        owner: ec2-user
+  - object: scripts
+    pattern: "**"
+    owner: ec2-user
 hooks:
   ApplicationStop:
     - location: stop.sh

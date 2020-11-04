@@ -1,0 +1,14 @@
+version: '3'
+services:
+  api:
+    container_name: foku-api
+    image: 374139594143.dkr.ecr.us-east-2.amazonaws.com/arquichat/MYAPP:latest
+    restart: always
+    ports:
+      - "7777:7777"
+    command:
+      "npm run start"
+    env_file: 
+      - /home/ec2-user/secrets/.env
+    environment: 
+      - NODE_ENV=production
