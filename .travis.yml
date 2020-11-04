@@ -1,9 +1,10 @@
 #Deploy script for Foku-api
 
-language: node_js
+language: python
 
-# env:
-#   - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
+env:
+  # - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
+  - PACKAGE_VERSION="1.0.*"
 services:
    - docker
 branches:
@@ -15,8 +16,8 @@ install:
 
 script:
   - echo "no tests!" #Tests go here
-  # - sed -i -e 's/\r$/\n/' start.sh
-  # - sed -i -e 's/\r$/\n/' stop.sh
+  # - scripts/start.sh
+  # - scripts/stop.sh
   # - sed -i -e 's/\r$/\n/' install.sh #correct files endings
   - zip -r latest *
   - mkdir -p dpl_cd_upload
@@ -26,10 +27,9 @@ script:
 #Give everything to ECR
 after_success:
   - docker --version  # document the version travis is using
-  - docker-compose up -d
   - pip install --user awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
-  - eval $(aws ecr get-login --region sa-east-1 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - eval $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
   - docker build -t $AWS_ECR_API:latest api
   - docker tag $AWS_ECR_API:latest
   - docker push $AWS_ECR_API:latest
