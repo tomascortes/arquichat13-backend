@@ -1,23 +1,53 @@
 sudo: required #is required to use docker service in travis
 
-language: python #can be any language, just php for example
+python:
+    - 3.6
 
 services:
   - docker # required, but travis uses older version of docker :(
 
 install:
-  - echo "install nothing!" # put your normal pre-testing installs here
+  # - pip install -r requirements.txt
+  - echo "install finished!" # put your normal pre-testing installs here
 
 script:
   - echo "no tests!" # put your normal testing scripts here
+  - docker-compose build
+  - zip -r latest *
+  - mkdir -p dpl_cd_upload
+  - mv latest.zip dpl_cd_upload/latest.zip
 
 after_success:
   - docker --version  # document the version travis is using
+  - docker-compose up -d
   - pip install --user awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
-  - eval $(aws ecr get-login --region us-east-1) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - docker-compose build -t my_example_app .
-  - docker tag my_example_app:latest [your_ecr_account].dkr.ecr.us-east-1.amazonaws.com/my_example_app:latest
-  - docker push [your_ecr_account].dkr.ecr.us-east-1.amazonaws.com/my_example_app:latest
+  - eval $(aws ecr get-login --region us-east-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - docker build -t $AWS_ECR_API:latest .
+  - docker tag arquichat:latest $AWS_ECR_API:latest #cambiardespues
+  - docker push $AWS_ECR_API:latest
+
+deploy:
+  - provider: s3
+  acces_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  bucket: "chat-deploy" #cambiar
+  region: sa-east-2 #no necesariamente pero cambiar
+  upload-dir: latest
+  - provider: codedeploy
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: "chat-deploy" #cambiar
+  key: latest/latest.zip
+  bundle_type: zip
+  application: api #probablemente cambiar
+  deployment_group: arquichat-backend-deploy #cambiar
+  region: sa-east-2
+  wait_until_deployed: true
+  on:
+    branch: master
+
   
 # sadly, travis doesn't cache docker builds yet, so each build will take a while
