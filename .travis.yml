@@ -1,53 +1,59 @@
-sudo: required #is required to use docker service in travis
+#Deploy script for Foku-api
 
-python:
-    - 3.6
+language: node_js
 
+# env:
+#   - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
 services:
-  - docker # required, but travis uses older version of docker :(
+   - docker
+branches:
+    only:
+        - master
 
 install:
-  # - pip install -r requirements.txt
-  - echo "install finished!" # put your normal pre-testing installs here
+  - echo "install nothing!" #Install goes here
 
 script:
-  - echo "no tests!" # put your normal testing scripts here
-  - docker-compose build
+  - echo "no tests!" #Tests go here
+  - sed -i -e 's/\r$/\n/' start.sh
+  - sed -i -e 's/\r$/\n/' stop.sh
+  - sed -i -e 's/\r$/\n/' install.sh #correct files endings
   - zip -r latest *
   - mkdir -p dpl_cd_upload
-  - mv latest.zip dpl_cd_upload/latest.zip
-
+  - mv latest.zip dpl_cd_upload/latest.zip 
+ 
+#This script will upload the built containers to ECR to be deployed on a single EC2 instance with docker
+#Give everything to ECR
 after_success:
   - docker --version  # document the version travis is using
   - docker-compose up -d
   - pip install --user awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
-  - eval $(aws ecr get-login --region us-east-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - docker build -t $AWS_ECR_API:latest .
-  - docker tag arquichat:latest $AWS_ECR_API:latest #cambiardespues
+  - eval $(aws ecr get-login --region sa-east-1 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - docker build -t $AWS_ECR_API:latest api
+  - docker tag $AWS_ECR_API:latest
   - docker push $AWS_ECR_API:latest
+  - docker images
 
 deploy:
-  - provider: s3
-  acces_key_id: $AWS_ACCESS_ID
-  secret_access_key: $AWS_SECRET_KEY
-  local_dir: dpl_cd_upload
-  skip_cleanup: true
-  bucket: "chat-deploy" #cambiar
-  region: sa-east-2 #no necesariamente pero cambiar
-  upload-dir: latest
-  - provider: codedeploy
+- provider: s3 #To upload the code to s3
   access_key_id: $AWS_ACCESS_ID
   secret_access_key: $AWS_SECRET_KEY
-  bucket: "chat-deploy" #cambiar
-  key: latest/latest.zip
-  bundle_type: zip
-  application: api #probablemente cambiar
-  deployment_group: arquichat-backend-deploy #cambiar
+  local_dir: dpl_cd_upload #from where
+  skip_cleanup: true #use cache (doesn't work...)
+  bucket: "chat-deploy" #target bucket to use
   region: sa-east-2
-  wait_until_deployed: true
+  upload-dir: latest
+- provider: codedeploy #Uploading to target group
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: "chat-deploy" #target bucket to use, definaed before
+  key: latest/latest.zip #Source code, you can use any name but must be consistent
+  bundle_type: zip
+  application: arquichat # si no funciona es api
+  deployment_group: arquichat-backend-deploy
+  region: sa-east-2
+  wait_until_deployed: true #wise thing to do
   on:
     branch: master
 
-  
-# sadly, travis doesn't cache docker builds yet, so each build will take a while
