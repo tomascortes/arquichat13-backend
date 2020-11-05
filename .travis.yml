@@ -29,7 +29,7 @@ script:
 #Give everything to ECR
 after_success:
   - docker --version  # document the version travis is using
-  - sudo pip3 install awscli # install aws cli w/o sudo
+  - sudo pip install awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - aws configure set aws_access_key_id $AWS_ACCESS_ID
   - aws configure set aws_secret_access_key $AWS_SECRET_KEY
