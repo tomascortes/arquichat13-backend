@@ -34,8 +34,9 @@ after_success:
   - aws configure set aws_access_key_id $AWS_ACCESS_ID
   - aws configure set aws_secret_access_key $AWS_SECRET_KEY
   - aws configure set preview.cloudfront true
-  - eval $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - sudo docker build -t $AWS_ECR_API:latest api
+  - echo $AWS_ACCESS_ID
+  - sudo eval $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - sudo docker build -t $AWS_ECR_API:latest arquichat
   - sudo docker tag $AWS_ECR_API:latest
   - sudo docker push $AWS_ECR_API:latest
   - sudo docker images
