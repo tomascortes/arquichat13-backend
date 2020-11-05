@@ -29,13 +29,13 @@ script:
 #Give everything to ECR
 after_success:
   - docker --version  # document the version travis is using
-  - pip install --user awscli # install aws cli w/o sudo
+  - sudo pip install awscli # install aws cli w/o sudo
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - eval $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - docker build -t $AWS_ECR_API:latest api
-  - docker tag $AWS_ECR_API:latest
-  - docker push $AWS_ECR_API:latest
-  - docker images
+  - sudo docker build -t $AWS_ECR_API:latest api
+  - sudo docker tag $AWS_ECR_API:latest
+  - sudo docker push $AWS_ECR_API:latest
+  - sudo docker images
 
 deploy:
 - provider: s3 #To upload the code to s3
