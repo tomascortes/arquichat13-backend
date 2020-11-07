@@ -114,7 +114,6 @@ services:
       - mynet
   channels:
     build: .
-   # command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
     command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
 
     volumes:
