@@ -8,6 +8,7 @@ services:
       - "7777:7777"
       - "8000:8000"
       - "8001:8001"
+      - "5432:5432"
     # command:
     #   "npm run start"
     env_file: 
