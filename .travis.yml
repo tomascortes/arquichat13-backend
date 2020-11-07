@@ -34,11 +34,10 @@ after_success:
   - aws configure set aws_access_key_id $AWS_ACCESS_ID
   - aws configure set aws_secret_access_key $AWS_SECRET_KEY
   - aws configure set preview.cloudfront true
-  - echo $AWS_ACCESS_ID
-  - echo $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - eval $(aws ecr get-login --region sa-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - echo $(aws ecr get-login --region us-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - eval $(aws ecr get-login --region us-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
   - sudo docker build -t $AWS_ECR_API:latest arquichat
-  - sudo docker tag $AWS_ECR_API:latest
+  - sudo docker tag $AWS_ECR_API:latest api
   - sudo docker push $AWS_ECR_API:latest
   - sudo docker images
 
@@ -49,7 +48,7 @@ deploy:
   local_dir: dpl_cd_upload #from where
   skip_cleanup: true #use cache (doesn't work...)
   bucket: chat-deploy #target bucket to use
-  region: sa-east-2
+  region: us-east-2
   upload-dir: latest
 - provider: codedeploy #Uploading to target group
   access_key_id: $AWS_ACCESS_ID
@@ -59,7 +58,7 @@ deploy:
   bundle_type: zip
   application: arquichat # si no funciona es api
   deployment_group: arquichat-backend-deploy
-  region: sa-east-2
+  region: us-east-2
   wait_until_deployed: true #wise thing to do
   on:
     branch: master
