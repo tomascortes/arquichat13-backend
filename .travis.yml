@@ -52,6 +52,7 @@ deploy:
   region: sa-east-2
   upload-dir: latest
 - provider: codedeploy #Uploading to target group
+  revision_type: github
   access_key_id: $AWS_ACCESS_ID
   secret_access_key: $AWS_SECRET_KEY
   bucket: chat-deploy #target bucket to use, definaed before
