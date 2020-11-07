@@ -1,3 +1,3 @@
 #!/bin/bash
-docker-compose -f /home/ec2-user/arquichat/docker-compose.production.yml down
-docker stop $(docker ps -a -q)
+sudo docker-compose -f /home/ec2-user/arquichat/docker-compose.yml down
+sudo docker stop $(docker ps -a -q)
