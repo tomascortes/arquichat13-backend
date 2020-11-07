@@ -12,6 +12,6 @@ services:
     # command:
     #   "npm run start"
     env_file: 
-      - /home/ec2-user/secrets/.env
+      - /home/ubuntu/secrets/.env
     # environment: 
     #   - NODE_ENV=production
