@@ -3,30 +3,30 @@ os: linux
 
 files:
   - source: scripts
-    destination: /home/ec2-user/arquichat
+    destination: /home/ubuntu/arquichat
 permissions:
   - object: scripts
     pattern: "**"
-    owner: ec2-user
+    owner: ubuntu
 hooks:
   ApplicationStop:
     - location: stop.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
   AfterInstall:
     - location: install.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
   ApplicationStart:
     - location: start.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
 #   ApplicationStop:
 #     - location: stop_server.sh
 #       timeout: 600
-#       runas: ec2-user
+#       runas: ubuntu
 
 #   BeforeInstall:
 #     - location: install_dependencies.sh
 #       timeout: 600
-#       runas: ec2-user
+#       runas: ubuntu
