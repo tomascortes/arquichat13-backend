@@ -36,8 +36,8 @@ after_success:
   - aws configure set preview.cloudfront true
   - echo $(aws ecr get-login --region us-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
   - eval $(aws ecr get-login --region us-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
-  - sudo docker build -t arquichat13-backend .
-  - sudo docker tag arquichat13-backend:latest 374139594143.dkr.ecr.us-east-2.amazonaws.com/arquichat:latest
+  - sudo docker build -t arquichat .
+  - sudo docker tag arquichat:latest 374139594143.dkr.ecr.us-east-2.amazonaws.com/arquichat:latest
   - sudo docker push $AWS_ECR_API:latest
   - sudo docker images
 
