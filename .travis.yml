@@ -2,6 +2,9 @@
 
 language: python
 
+python:
+  - "3.8"
+
 env:
   # - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
   - PACKAGE_VERSION="1.0.7"
@@ -12,10 +15,12 @@ branches:
         - master
 
 install:
-  - echo "install nothing!" #Install goes here
+  #- echo "install nothing!" #Install goes here
+  - pip install -r requirements.txt
 
 script:
-  - echo "no tests!" #Tests go here
+  - python manage.py test
+  #- echo "no tests!" #Tests go here
   # - scripts/start.sh
   # - scripts/stop.sh
   - sed -i -e 's/\r$/\n/' scripts/start.sh
