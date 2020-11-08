@@ -2,11 +2,6 @@
 
 language: python
 
-virtualenv:
-  system_site_packages: true
-
-
-
 env:
   # - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
   - PACKAGE_VERSION="1.0.4"
