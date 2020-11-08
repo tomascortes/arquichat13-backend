@@ -17,7 +17,10 @@ install:
   - echo "install nothing!" #Install goes here
 
 script:
-  - echo "no tests!" #Tests go here
+  - sudo docker-compose up -d
+  - sudo docker-compose exec api python manage.py test chat
+  - sudo docker-compose down
+  #- echo "no tests!" #Tests go here
   # - scripts/start.sh
   # - scripts/stop.sh
   # - sed -i -e 's/\r$/\n/' install.sh #correct files endings
