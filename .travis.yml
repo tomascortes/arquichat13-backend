@@ -14,7 +14,8 @@ branches:
         - master
 
 install:
-  - echo "install nothing!" #Install goes here
+  #- echo "install nothing!" #Install goes here
+  - pip install -r requirements.txt
 
 script:
   - python manage.py test chat
