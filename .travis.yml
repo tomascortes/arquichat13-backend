@@ -16,7 +16,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - python manage.py test chat
+  - pytest
   #- echo "no tests!" #Tests go here
   # - scripts/start.sh
   # - scripts/stop.sh
