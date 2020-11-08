@@ -6,8 +6,11 @@ files:
     destination: /home/ubuntu/arquichat
 permissions:
   - object: scripts
-    pattern: "**"
     owner: ubuntu
+    group: ubuntu
+    type:
+      - directory
+      - file
 hooks:
   ApplicationStop:
     - location: stop.sh
