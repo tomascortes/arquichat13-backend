@@ -17,9 +17,7 @@ install:
   - echo "install nothing!" #Install goes here
 
 script:
-  - sudo docker-compose up -d
-  - sudo docker-compose exec api python manage.py test chat
-  - sudo docker-compose down
+  - python manage.py test chat
   #- echo "no tests!" #Tests go here
   # - scripts/start.sh
   # - scripts/stop.sh
