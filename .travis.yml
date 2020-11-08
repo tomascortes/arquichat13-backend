@@ -41,26 +41,26 @@ after_success:
   - sudo docker push $AWS_ECR_API:latest
   - sudo docker images
 
-# deploy:
-# - provider: s3 #To upload the code to s3
-#   access_key_id: $AWS_ACCESS_ID
-#   secret_access_key: $AWS_SECRET_KEY
-#   local_dir: dpl_cd_upload #from where
-#   skip_cleanup: true #use cache (doesn't work...)
-#   bucket: chat-deploy #target bucket to use
-#   region: us-east-2
-#   upload-dir: latest
-# - provider: codedeploy #Uploading to target group
-#   revision_type: github
-#   access_key_id: $AWS_ACCESS_ID
-#   secret_access_key: $AWS_SECRET_KEY
-#   bucket: chat-deploy #target bucket to use, definaed before
-#   key: latest/latest.zip #Source code, you can use any name but must be consistent
-#   bundle_type: zip
-#   application: arquichat # si no funciona es api
-#   deployment_group: arquichat-backend-deploy
-#   region: us-east-2
-#   wait_until_deployed: true #wise thing to do
-#   on:
-#     branch: master
+deploy:
+- provider: s3 #To upload the code to s3
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
+  local_dir: dpl_cd_upload #from where
+  skip_cleanup: true #use cache (doesn't work...)
+  bucket: chat-deploy #target bucket to use
+  region: us-east-2
+  upload-dir: latest
+- provider: codedeploy #Uploading to target group
+  revision_type: github
+  access_key_id: $AWS_ACCESS_ID
+  secret_access_key: $AWS_SECRET_KEY
+  bucket: chat-deploy #target bucket to use, definaed before
+  key: latest/latest.zip #Source code, you can use any name but must be consistent
+  bundle_type: zip
+  application: arquichat # si no funciona es api
+  deployment_group: arquichat-backend-deploy
+  region: us-east-2
+  wait_until_deployed: true #wise thing to do
+  on:
+    branch: master
 
