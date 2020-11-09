@@ -63,7 +63,7 @@ deploy:
   key: latest/latest.zip #Source code, you can use any name but must be consistent
   bundle_type: zip
   application: arquichat # si no funciona es api
-  deployment_group: arquichat-backend-deploy
+  deployment_group: testingdeploy #aca hay qeu cambiar para producto final AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   region: us-east-2
   wait_until_deployed: true #wise thing to do
   on:
