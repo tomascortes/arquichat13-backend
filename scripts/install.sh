@@ -1,6 +1,6 @@
 #!/bin/bash
 sudo apt install python3-pip
-sudo pip install awscli 
+sudo pip3 install awscli 
 pwd=$( aws ecr get-login-password )
 sudo service docker start
 # sudo docker container stop $(docker container ls -aq)
