@@ -19,7 +19,7 @@ services:
     restart: always
     image: postgres
     env_file: 
-      - .env
+      - /home/ubuntu/secrets/.env
     ports:
       - "5432:5432"
     networks:
@@ -35,7 +35,7 @@ services:
     volumes:
       - redis:/redis
     env_file: 
-      - .env
+      - /home/ubuntu/secrets/.env
     networks:
       - mynet
 
@@ -87,7 +87,7 @@ services:
     links:
       - redis
     env_file: 
-      - .env
+      - /home/ubuntu/secrets/.env
     networks:
       - mynet
   channels:
@@ -105,7 +105,7 @@ services:
     links: 
       - redis
     env_file:
-      - .env
+      - /home/ubuntu/secrets/.env
     networks:
       - mynet
 volumes:
