@@ -15,15 +15,15 @@ hooks:
   ApplicationStop:
     - location: scripts/stop.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
   AfterInstall:
     - location: scripts/install.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
   ApplicationStart:
     - location: scripts/start.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
 #   ApplicationStop:
 #     - location: stop_server.sh
 #       timeout: 600
