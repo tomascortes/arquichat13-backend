@@ -12,8 +12,11 @@ services:
     #   "npm run start"
     env_file: 
       - /home/ubuntu/secrets/.env
-    # environment: 
-    #   - NODE_ENV=production
+    depends_on:
+      - db
+      - redis
+    networks:
+      - mynet
   db:
     restart: always
     image: postgres
