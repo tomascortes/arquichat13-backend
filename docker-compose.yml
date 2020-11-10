@@ -15,7 +15,6 @@
 # https://www.youtube.com/watch?v=8ZTVGCoEyFs 
 
 version: '3'
-
 services:
   db:
     restart: always
@@ -39,7 +38,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - "8000:80"
+      - "80:8000"
     env_file: 
       - .env 
     depends_on:
@@ -60,7 +59,31 @@ services:
       - .env
     networks:
       - mynet
+  # nginx:
+  #   image: nginx:1.15.9-alpine
+  #   depends_on:
+  #       - api
+  #       - worker_channels
+  #       - channels
+  #   volumes:
+  #       - ./config/nginx/:/etc/nginx/conf.d
+  #       - ./data/certbot/conf:/etc/letsencrypt
+  #       - ./data/certbot/www:/var/www/certbot
+  #       # - ./config/certbot/conf:/etc/letsencrypt
+  #       # - ./config/certbot/www:/var/www/certbot
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  #   networks:
+  #     - mynet
 
+  # certbot:
+  #   image: certbot/certbot
+  #   volumes:
+  #     - ./data/certbot/conf:/etc/letsencrypt
+  #     - ./data/certbot/www:/var/www/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   worker_channels:
     build: .
@@ -78,8 +101,8 @@ services:
       - mynet
   channels:
     build: .
-   # command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
-    command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
+    command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
+    # command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
 
     volumes:
       - .:/code
