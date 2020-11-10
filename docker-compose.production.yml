@@ -8,8 +8,6 @@ services:
       - "7777:7777"
       - "8000:8000"
    
-    # command:
-    #   "npm run start"
     env_file: 
       - /home/ubuntu/secrets/.env
     depends_on:
@@ -41,32 +39,7 @@ services:
     networks:
       - mynet
 
-  nginx:
-    image: nginx:1.15.9-alpine
-    depends_on:
-        - api
-        - worker_channels
-        - channels
-    volumes:
-        - ./config/nginx/:/etc/nginx/conf.d
-        - ./data/certbot/conf:/etc/letsencrypt
-        - ./data/certbot/www:/var/www/certbot
-        # - ./config/certbot/conf:/etc/letsencrypt
-        # - ./config/certbot/www:/var/www/certbot
-    ports:
-      - 80:80
-      - 443:443
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    networks:
-      - mynet
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
+  
       
   #   command: "/bin/sh -c 'while :; do sleep 12h & wait $${!}; sudo nginx -s reload; done & nginx -g \"daemon off;\"'"
   # certbot:
@@ -100,7 +73,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - "8001:8001"
+      - "8001:80"
     depends_on:
       - db
       - redis

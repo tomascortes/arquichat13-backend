@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 from django.db import connection
 from datetime import datetime
 
+from urllib.parse import unquote
+
 
 def index(request):
     rooms = ChatRoom.objects.all()
@@ -152,22 +154,30 @@ def verify_admin(username, password):
     return False 
 
 
-def delete_message(request, room_name, message, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('')
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def delete_message(request, room_name, message):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('')
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
-        message = Message.objects.filter(room__topic=room_name, text=message)
-        message.delete()
+        print("A", message)
+        message = unquote(message).replace(" ", "")
+        print("B", message)
+        room = ChatRoom.objects.get(topic=room_name)
+        print("--")
+
+        message_ = [m for m in room.message_set.all() if m.text.replace(" ", "")==message][0]
+        print("C", message_)
+        message_.delete()
+        print("D")
         response = HttpResponse('')
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
         return response
-    except Message.DoesNotExist:
+    except:
         response = HttpResponse('Bad request', status=400)
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
@@ -175,17 +185,20 @@ def delete_message(request, room_name, message, username, password):
         return response
 
 
-def delete_room(request, room_name, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def delete_room(request, room_name):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         room = ChatRoom.objects.get(topic=room_name)
+        print("A")
         room.delete()
+        print("B")
         response = HttpResponse('')
+        print("C")
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
@@ -199,17 +212,31 @@ def delete_room(request, room_name, username, password):
     
 
 
-def edit_message(request, room_name, message, new_message, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def edit_message(request, room_name, message, new_message):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
-        message = Message.objects.filter(room__topic=room_name, text=message)
-        message.text = new_message
-        message.save()
+        print("A", message, "-")
+        message = unquote(message).replace(" ", "")
+        print("B", message, "-", new_message)
+        new_message = unquote(new_message)
+        print("C", new_message)
+        room = ChatRoom.objects.get(topic=room_name)
+        print("--")
+        messages_ = [m for m in room.message_set.all() if m.text.replace(" ", "")==message]
+        print(messages_)
+        print("D")
+        print(messages_[0])
+        message_ = messages_[0]
+        print(type(room), type(message_))
+        message_.text = new_message
+        print("E")
+        message_.save()
+        print("F")
         response = HttpResponse('Reload Required', status=200)
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
@@ -223,13 +250,38 @@ def edit_message(request, room_name, message, new_message, username, password):
         return response
 
 
-def edit_room(request, room_name, username, password):  # only change privacy for now
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
+def edit_room(request, room_name, css, js):  # only change css and js
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
+    try:
+        room = ChatRoom.objects.get(topic=room_name)
+        room.css = css
+        room.js = js
+        room.save()
+        response = HttpResponse('Privacy changed', status=200)
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
         return response
+    except:
+        response = HttpResponse('Bad request', status=400)
+        host = socket.gethostbyname(socket.gethostname())
+        response.__setitem__('host_ip', host)
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
+
+
+def edit_room_privacy(request, room_name):  # only change privacy
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         room = ChatRoom.objects.get(topic=room_name)
         if room.private:
@@ -250,13 +302,13 @@ def edit_room(request, room_name, username, password):  # only change privacy fo
         return response
     
 
-def delete_user(request, username, admin, password):
-    if not verify_admin(admin, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def delete_user(request, username):
+    # if not verify_admin(admin, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         u = User.objects.get(username=username)
         u.delete()
@@ -273,13 +325,17 @@ def delete_user(request, username, admin, password):
         return response
 
 
-def create_request(request, room_name, css, js):
+def create_req(request, room_name, css, js):
     try:
-        room = ChatRoom.objects.get(topic=self.room_name)
+        print("A")
+        room = ChatRoom.objects.get(topic=room_name)
+        print("B")
         req = Request(id=None, room=room, css=css, js=js)
+        print("C")
         req.save()
-        room.save()
+        print("D")
         response = HttpResponse('')
+        print("E")
         host = socket.gethostbyname(socket.gethostname())
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
@@ -292,13 +348,13 @@ def create_request(request, room_name, css, js):
         return response
 
 
-def room_requests(request, room_name, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def room_requests(request, room_name):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         room = ChatRoom.objects.get(topic=room_name)
         reqs = [{'css': r.css, 'js': r.js} for r in room.request_set.all()]
@@ -322,13 +378,13 @@ def room_requests(request, room_name, username, password):
 
 
 
-def delete_requests(request, room_name, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def delete_requests(request, room_name):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         room = ChatRoom.objects.get(topic=room_name)
         room.request_set.all().delete()
@@ -345,13 +401,13 @@ def delete_requests(request, room_name, username, password):
         return response
 
 
-def admin_room(request, username, password):
-    if not verify_admin(username, password):
-        response = HttpResponse('Authentication error', status=401)
-        host = socket.gethostbyname(socket.gethostname())
-        response.__setitem__('host_ip', host)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+def admin_room(request):
+    # if not verify_admin(username, password):
+    #     response = HttpResponse('Authentication error', status=401)
+    #     host = socket.gethostbyname(socket.gethostname())
+    #     response.__setitem__('host_ip', host)
+    #     response['Access-Control-Allow-Origin'] = '*'
+    #     return response
     try:
         rooms = [room.topic for room in ChatRoom.objects.all()]
         users = [u.username for u in User.objects.all()]
@@ -369,3 +425,4 @@ def admin_room(request, username, password):
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
         return response
+    

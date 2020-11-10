@@ -7,7 +7,7 @@ python:
 
 env:
   # - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
-  - PACKAGE_VERSION="1.0.8"
+  - PACKAGE_VERSION="1.0.9"
 services:
    - docker
 branches:
@@ -71,4 +71,3 @@ deploy:
   wait_until_deployed: true #wise thing to do
   on:
     branch: master
-
