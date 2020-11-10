@@ -23,9 +23,9 @@ script:
   #- echo "no tests!" #Tests go here
   # - scripts/start.sh
   # - scripts/stop.sh
-  # - sed -i -e 's/\r$/\n/' scripts/start.sh
-  # - sed -i -e 's/\r$/\n/' scripts/stop.sh
-  # - sed -i -e 's/\r$/\n/' scripts/install.sh #correct files endings
+  - sed -i -e 's/\r$/\n/' scripts/start.sh
+  - sed -i -e 's/\r$/\n/' scripts/stop.sh
+  - sed -i -e 's/\r$/\n/' scripts/install.sh #correct files endings
   - chmod +x scripts/start.sh
   - chmod +x scripts/stop.sh
   - chmod +x scripts/install.sh
