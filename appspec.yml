@@ -5,7 +5,7 @@ files:
   - source: /
     destination: /home/ubuntu/arquichat
 permissions:
-  - object: /opt/codedeploy-agent/deployment-root/c42ae13b-441d-4af1-a910-cb1b4687bb31/d-NON2BJ686/deployment-archive/scripts/
+  - object: /
     owner: ubuntu
     group: ubuntu
     type:
