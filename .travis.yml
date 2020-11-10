@@ -26,6 +26,9 @@ script:
   # - sed -i -e 's/\r$/\n/' scripts/start.sh
   # - sed -i -e 's/\r$/\n/' scripts/stop.sh
   # - sed -i -e 's/\r$/\n/' scripts/install.sh #correct files endings
+  - chmod +x scripts/start.sh
+  - chmod +x scripts/stop.sh
+  - chmod +x scripts/install.sh
   - zip -r -q latest *  && echo "success" || echo "failure"
   - mkdir -p dpl_cd_upload
   - mv latest.zip dpl_cd_upload/latest.zip 
