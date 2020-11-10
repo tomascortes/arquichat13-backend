@@ -5,9 +5,11 @@ services:
     image: 374139594143.dkr.ecr.us-east-2.amazonaws.com/arquichat:latest
     restart: always
     ports:
-      - "80:8000"
-      - "443:8000"
-      
+      - "7777:7777"
+      - "8000:8000"
+   
+    # command:
+    #   "npm run start"
     env_file: 
       - /home/ubuntu/secrets/.env
     depends_on:
@@ -38,30 +40,42 @@ services:
       - /home/ubuntu/secrets/.env
     networks:
       - mynet
-  # nginx:
-  #   image: nginx:1.15.9-alpine
-  #   depends_on:
-  #       - api
-  #       - worker_channels
-  #       - channels
-  #   volumes:
-  #       - ./config/nginx/:/etc/nginx/conf.d
-  #       - ./data/certbot/conf:/etc/letsencrypt
-  #       - ./data/certbot/www:/var/www/certbot
-  #       # - ./config/certbot/conf:/etc/letsencrypt
-  #       # - ./config/certbot/www:/var/www/certbot
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-  #   networks:
-  #     - mynet
 
+  nginx:
+    image: nginx:1.15.9-alpine
+    depends_on:
+        - api
+        - worker_channels
+        - channels
+    volumes:
+        - ./config/nginx/:/etc/nginx/conf.d
+        - ./data/certbot/conf:/etc/letsencrypt
+        - ./data/certbot/www:/var/www/certbot
+        # - ./config/certbot/conf:/etc/letsencrypt
+        # - ./config/certbot/www:/var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - mynet
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+      
+  #   command: "/bin/sh -c 'while :; do sleep 12h & wait $${!}; sudo nginx -s reload; done & nginx -g \"daemon off;\"'"
   # certbot:
   #   image: certbot/certbot
   #   volumes:
-  #     - ./data/certbot/conf:/etc/letsencrypt
-  #     - ./data/certbot/www:/var/www/certbot
+  #     - ./config/certbot/conf:/etc/letsencrypt
+  #     - ./config/certbot/www:/var/www/certbot
+  #   networks:
+  #     - mynet
   #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   worker_channels:
@@ -80,8 +94,8 @@ services:
       - mynet
   channels:
     build: .
-    command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
-    # command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
+   # command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
+    command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
 
     volumes:
       - .:/code
