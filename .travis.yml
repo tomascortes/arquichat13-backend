@@ -7,7 +7,7 @@ python:
 
 env:
   # - AWS_USER_ID="xxxxxxxx" AWS_ECR_API="xxxxxxxxx.dkr.ecr.sa-east-1.amazonaws.com/MYAPP"
-  - PACKAGE_VERSION="1.0.4"
+  - PACKAGE_VERSION="1.0.9"
 services:
    - docker
 branches:
@@ -26,6 +26,9 @@ script:
   - sed -i -e 's/\r$/\n/' scripts/start.sh
   - sed -i -e 's/\r$/\n/' scripts/stop.sh
   - sed -i -e 's/\r$/\n/' scripts/install.sh #correct files endings
+  - chmod +x scripts/start.sh
+  - chmod +x scripts/stop.sh
+  - chmod +x scripts/install.sh
   - zip -r -q latest *  && echo "success" || echo "failure"
   - mkdir -p dpl_cd_upload
   - mv latest.zip dpl_cd_upload/latest.zip 
@@ -63,9 +66,8 @@ deploy:
   key: latest/latest.zip #Source code, you can use any name but must be consistent
   bundle_type: zip
   application: arquichat # si no funciona es api
-  deployment_group: arquichat-backend-deploy
+  deployment_group: testingdeploy #aca hay qeu cambiar para producto final AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   region: us-east-2
   wait_until_deployed: true #wise thing to do
   on:
     branch: master
-

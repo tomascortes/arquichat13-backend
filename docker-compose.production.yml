@@ -1,0 +1,105 @@
+version: '3'
+services:
+  api:
+    container_name: api
+    image: 374139594143.dkr.ecr.us-east-2.amazonaws.com/arquichat:latest
+    restart: always
+    ports:
+      - "8000:8000"
+      
+    env_file: 
+      - /home/ubuntu/secrets/.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - mynet
+  db:
+    restart: always
+    image: postgres
+    env_file: 
+      - /home/ubuntu/secrets/.env
+    ports:
+      - "5432:5432"
+    networks:
+      - mynet
+    volumes: 
+      - data:/var/lib/postgresql/data
+  redis:
+    restart: always
+    image: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/redis
+    env_file: 
+      - /home/ubuntu/secrets/.env
+    networks:
+      - mynet
+  nginx:
+    image: nginx:1.15.9-alpine
+    depends_on:
+        - api
+        - worker_channels
+        - channels
+    volumes:
+        - ./config/nginx/:/etc/nginx/conf.d
+        - ./data/certbot/conf:/etc/letsencrypt
+        - ./data/certbot/www:/var/www/certbot
+        # - ./config/certbot/conf:/etc/letsencrypt
+        # - ./config/certbot/www:/var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - mynet
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  worker_channels:
+    build: .
+    command: python manage.py runworker
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+    env_file: 
+      - /home/ubuntu/secrets/.env
+    networks:
+      - mynet
+  channels:
+    build: .
+    #command: daphne -b 0.0.0.0 -p 8001 arqui_proyect.asgi:application
+    command: daphne -e ssl:8001:privateKey=cert\\private.pem:certKey=cert\\public.pem real_time_table.asgi:application
+
+    volumes:
+      - .:/code
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - redis
+    links: 
+      - redis
+    env_file:
+      - /home/ubuntu/secrets/.env
+    networks:
+      - mynet
+volumes:
+  .:
+  data:
+  redis: 
+
+networks:
+  mynet:
+    driver: bridge
