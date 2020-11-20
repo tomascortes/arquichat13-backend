@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from corsheaders.defaults import default_headers
+import sys
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'HEADER_USERNAME',
