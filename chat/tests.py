@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from .models import ChatRoom
 import json
-# Create your tests here.
+# Create your tests here
 
 class ChatTests(TestCase):
     def test_chat_endpoint(self):
