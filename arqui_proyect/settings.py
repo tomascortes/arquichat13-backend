@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-import sys
 from corsheaders.defaults import default_headers
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
@@ -101,16 +100,6 @@ DATABASES = {
     }
 }
 
-
-if 'test' in sys.argv:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3', 
-        'NAME': 'sqlite3.db',
-        'USER': '',                     
-        'PASSWORD': '',                  
-        'HOST': '',                      
-        'PORT': '',                      
-    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

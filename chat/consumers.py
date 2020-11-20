@@ -110,7 +110,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = "(" + datetime.now().ctime() + ")" + final
 
         # Save message and send message to room group
-        m = Message(id=None, text=message, room=room)
+        m = Message(id=None, text=message, original=message, room=room)
         m.save()
         await self.channel_layer.group_send(
             self.room_group_name,

@@ -2,25 +2,28 @@ version: 0.0
 os: linux
 
 files:
-  - source: scripts
+  - source: /
     destination: /home/ubuntu/arquichat
 permissions:
-  - object: scripts
-    pattern: "**"
+  - object: /
     owner: ubuntu
+    group: ubuntu
+    type:
+      - directory
+      - file
 hooks:
   ApplicationStop:
-    - location: stop.sh
+    - location: scripts/stop.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
   AfterInstall:
-    - location: install.sh
+    - location: scripts/install.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
   ApplicationStart:
-    - location: start.sh
+    - location: scripts/start.sh
       timeout: 600
-      runas: ubuntu
+      runas: root
 #   ApplicationStop:
 #     - location: stop_server.sh
 #       timeout: 600
