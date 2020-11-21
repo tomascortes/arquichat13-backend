@@ -17,6 +17,7 @@ branches:
 install:
   #- echo "install nothing!" #Install goes here
   - pip install -r requirements.txt
+  - travis_wait 30 mvn install
 
 script:
   - python manage.py test
