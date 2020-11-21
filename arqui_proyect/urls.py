@@ -27,4 +27,5 @@ urlpatterns = [
     path('req/<str:room_name>/<str:css>/<str:js>/', v.create_req),
     path('request/index/<str:room_name>/', v.room_requests),
     path('request/delete/<str:room_name>/', v.delete_requests),
+    path('/check', v.check),
 ]

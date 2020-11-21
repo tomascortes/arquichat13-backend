@@ -425,4 +425,10 @@ def admin_room(request):
         response.__setitem__('host_ip', host)
         response['Access-Control-Allow-Origin'] = '*'
         return response
-    
+
+def check(request):
+    response = HttpResponse(status=200)
+    host = socket.gethostbyname(socket.gethostname())
+    response.__setitem__('host_ip', host)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
