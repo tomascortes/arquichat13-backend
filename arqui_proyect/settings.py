@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from corsheaders.defaults import default_headers
+import sys
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'HEADER_USERNAME',
@@ -99,6 +100,16 @@ DATABASES = {
         'PORT': 5432,
     }
 }
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3', 
+        'NAME': 'sqlite3.db',
+        'USER': '',                     
+        'PASSWORD': '',                  
+        'HOST': '',                      
+        'PORT': '',                      
+    }
 
 
 # Password validation

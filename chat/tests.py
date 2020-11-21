@@ -13,9 +13,9 @@ class ChatTests(TestCase):
         ChatRoom.objects.create(topic='TestRoom')
         response = self.client.get(reverse('index'))
         response = json.loads(response.content)
-        self.assertQuerysetEqual(response, ['"{\'topic\': \'TestRoom\', \'private\': False}"'])
+        self.assertQuerysetEqual(response, ['"{\'topic\': \'TestRoom\', \'private\': False, \'css\': \'\', \'js\': \'\'}"'])
 
     def test_new_chat_room(self):
-        response = self.client.get(reverse('room', args=['test_room']))
+        response = self.client.get(reverse('room', args=['test_room', 'css', 'js']))
         response = json.loads(response.content)
-        self.assertEqual(response, {'alias': 'anon', 'room_topic': 'test_room', 'messages': []})
+        self.assertEqual(response, {'alias': 'anon', 'room_topic': 'test_room', 'messages': [], 'css': 'css', 'js': ''})
